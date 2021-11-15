@@ -29,6 +29,11 @@ import reactor.core.publisher.Mono;
  */
 public interface AsyncPredicate<T> extends Function<T, Publisher<Boolean>> {
 
+	/**
+	* 与操作，即两个Predicate组成一个，同时都需要满足
+	* @param other
+	* @return org.springframework.cloud.gateway.handler.AsyncPredicate<T>
+	*/
 	default AsyncPredicate<T> and(AsyncPredicate<? super T> other) {
 		Objects.requireNonNull(other, "other must not be null");
 
@@ -36,10 +41,20 @@ public interface AsyncPredicate<T> extends Function<T, Publisher<Boolean>> {
 				.map(tuple -> tuple.getT1() && tuple.getT2());
 	}
 
+	/**
+	* 取反操作，对Predicate匹配结果取反
+	* @param 
+	* @return org.springframework.cloud.gateway.handler.AsyncPredicate<T>
+	*/
 	default AsyncPredicate<T> negate() {
 		return t -> Mono.from(apply(t)).map(b -> !b);
 	}
 
+	/**
+	* 或操作，两个Predicate组成一个，只需满足其一
+	* @param other
+	* @return org.springframework.cloud.gateway.handler.AsyncPredicate<T>
+	*/
 	default AsyncPredicate<T> or(AsyncPredicate<? super T> other) {
 		Objects.requireNonNull(other, "other must not be null");
 

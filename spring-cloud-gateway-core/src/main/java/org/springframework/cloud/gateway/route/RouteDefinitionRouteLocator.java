@@ -66,6 +66,13 @@ public class RouteDefinitionRouteLocator implements RouteLocator, BeanFactoryAwa
 	private BeanFactory beanFactory;
 	private ApplicationEventPublisher publisher;
 
+	/**
+	* RouteDefinitionRouteLocator
+	* @param routeDefinitionLocator RouteDefinitionLocator 对象
+	* @param predicates Predicate 工厂列表，会被映射成 key 为 name, value 为 factory 的 Map。可以猜想出 gateway 是如何根据 PredicateDefinition 中定义的 name 来匹配到相对应的 factory 了
+	* @param gatewayFilterFactories Gateway Filter 工厂列表，同样会被映射成 key 为 name, value 为 factory 的 Map
+	* @param gatewayProperties 外部化配置类
+	*/
 	public RouteDefinitionRouteLocator(RouteDefinitionLocator routeDefinitionLocator,
 									   List<RoutePredicateFactory> predicates,
 									   List<GatewayFilterFactory> gatewayFilterFactories,
@@ -124,7 +131,9 @@ public class RouteDefinitionRouteLocator implements RouteLocator, BeanFactoryAwa
 	}
 
 	private Route convertToRoute(RouteDefinition routeDefinition) {
+		// 将 PredicateDefinition 转换成 AsyncPredicate
 		AsyncPredicate<ServerWebExchange> predicate = combinePredicates(routeDefinition);
+		// 将 FilterDefinition 转换成 GatewayFilter
 		List<GatewayFilter> gatewayFilters = getFilters(routeDefinition);
 
 		return Route.async(routeDefinition)
